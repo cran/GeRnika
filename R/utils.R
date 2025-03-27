@@ -92,17 +92,6 @@ get_descendants_idx <- function(B, node_idx) {
   }
 }
 
-calc_F <- function(U, B, heterozygous = TRUE) {
-  F_homozygous <- U %*% B
-  if (heterozygous) {
-    F_ <- 0.5 * F_homozygous
-  } else {
-    F_ <- F_homozygous
-  }
-  # wrap values of F between 0 and 1 as they represent clone proportions
-  return(apply(F_, c(1,2), FUN = function(x) min(x,1)))
-}
-
 merge_graphs<-function(phylotree,merge,graphs,i,labels){
   if(i>length(graphs)){
     return(merge)
@@ -120,5 +109,56 @@ rdir <-  function(n, alpha) {
     x <- matrix(stats::rgamma(l*n,alpha),ncol=l,byrow=TRUE)
     sm <- x%*%rep(1,l)
     return(x/as.vector(sm))
+}
+
+sample.vec <- function(x, ...) x[sample(length(x), ...)]
+
+.distribute_freqs <- function(B, clone_idx, clone_proportions, selection) {
+  dirich_params <- dplyr::tibble(positive = rep(0.3, 2),
+                                 neutral = c(5, 10))
+  children_clone_idx <- get_children_idx(B = B, node_idx = clone_idx)
+  if (!is.null(children_clone_idx)) {
+    params <- dplyr::pull(dirich_params, eval(selection))
+    dirich_values <- rdir(1, c(params[1],
+                               rep(params[2], length(children_clone_idx))))
+    # Normalize the values to the parent clone's proportion
+    norm_dirich_values <- dirich_values*clone_proportions[clone_idx]
+    clone_proportions[c(clone_idx, children_clone_idx)] <- norm_dirich_values
   }
+  return(clone_proportions)
+}
+
+calc_clone_proportions <- function(B, selection) {
+  n <- nrow(B)
+  clone_proportions <- rep(1, n)
+  root_clone_idx <- get_root_clone(B)
+  for (clone_idx in c(root_clone_idx, get_descendants_idx(B, root_clone_idx))) {
+    clone_proportions <- .distribute_freqs(B, clone_idx, clone_proportions, selection)
+  }
+  # sum(clone_proportions)
+  clone_proportion_df <- dplyr::tibble(clone_idx = paste0("clon", 1:n), proportion = clone_proportions)
+  # clon_i corresponds to clone containing mutation i for the first time and not necessarility the clone in row i, but in this case it is also the clone in row i because of the way we construct the B matrix
+  return(clone_proportion_df)
+}
+
+place_clones_space <- function(B) {
+  n <- nrow(B)
+  . <- NULL
+  max_sep <- 4
+  mean_diffs <- seq(from = 0, to = max_sep, by = 0.1)
+  clone_order <- sample(1:n, n)
+  clone_mean_diff <- sample(x = mean_diffs,
+                            size = n-1,
+                            prob = stats::dbeta(x = seq(0, 1, length.out = length(mean_diffs)), shape1 = 1, shape2 = 5), replace = TRUE) # change beta distribution parameters for tumor density
+  clone_means <- c(0, cumsum(clone_mean_diff))
+  clone_sd <- 1
+  x <- seq(min(clone_means - 3*clone_sd), max(clone_means + 3*clone_sd), .01)
+  y <- purrr::map(1:n, function(z) stats::dnorm(x, mean = clone_means[z], sd = clone_sd)) %>%
+    do.call(cbind, .) %>%
+    dplyr::as_tibble(.name_repair = ~ vctrs::vec_as_names(..., repair = "unique", quiet = TRUE)) %>%
+    magrittr::set_colnames(paste0("clon", clone_order))
+  spatial_coords <- y %>%
+    dplyr::mutate(idx = x)
+  return(list(spatial_coords = spatial_coords, x = x))
+}
 

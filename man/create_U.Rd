@@ -4,18 +4,16 @@
 \alias{create_U}
 \title{Calculate tumor clone frequencies in samples}
 \usage{
-create_U(B, clone_proportions, density_coords, m, x)
+create_U(B, m, selection, n_cells = 100)
 }
 \arguments{
 \item{B}{A matrix representing the mutation relationships between the nodes in the phylogenetic tree (B matrix).}
 
-\item{clone_proportions}{A data frame with two columns: 'clone_idx', which contains the clone identifiers, and 'proportion', which contains the proportions of each clone in the tumor.}
-
-\item{density_coords}{A data frame where each column represents the density of a clone at different spatial coordinates.}
-
 \item{m}{An integer representing the number of samples taken from the tumor.}
 
-\item{x}{A numeric vector representing the spatial coordinates.}
+\item{selection}{A character string representing the evolutionary mode the tumor follows. This should be either "positive" or "neutral".}
+
+\item{n_cells}{An integer representing the number of cells sampled from the multinomial distribution. Default is 100.}
 }
 \value{
 A matrix where each row corresponds to a sample, and each column corresponds to a clone. The value at the i-th row and j-th column is the frequency of the j-th clone in the i-th sample.
@@ -24,22 +22,10 @@ A matrix where each row corresponds to a sample, and each column corresponds to 
 This function calculates the frequencies of each clone in a set of samples, given the global clone proportions in the tumor and their spatial distribution.
 }
 \examples{
-# Calculate the frequencies of each clone in 10 samples taken from a tumor represented by the B 
-# matrix B_mat, with global clone proportions clone_proportions, spatial distribution 
-# density_coords, and spatial coordinates x
 
-# Create random topology
+# Create random topology with 20 nodes and k = 3
 B <- create_B(20, 3)
 
-# Assign proportions to each clone following a neutral evolution model
-clone_proportions <- calc_clone_proportions(B, "neutral")
-
-# Place clones in 1D space
-clones_space <- place_clones_space(B)
-density_coords <- clones_space$spatial_coords
-domain <- clones_space$x
-
-# Create U matrix with parameter m=4
-U <- create_U(B = B, clone_proportions = clone_proportions, 
-              density_coords = density_coords, m = 4, x = domain)
+# Create U matrix with parameter m=4 and "positive" selection
+U <- create_U(B = B, m = 4, selection = "positive")
 }

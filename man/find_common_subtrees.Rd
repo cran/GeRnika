@@ -26,7 +26,7 @@ B_mats <- GeRnika::B_mats
 
 
 B_real <- B_mats[[2]]$B_real
-B_opt <- B_mats[[2]]$B_opt
+B_alg1 <- B_mats[[2]]$B_alg1
 
 
 # Generate the tags for the genes of
@@ -40,8 +40,8 @@ phylotree_real <- B_to_phylotree(
                     B = B_real, 
                     labels = tags)
                     
-phylotree_opt <- B_to_phylotree(
-                    B = B_opt, 
+phylotree_alg1 <- B_to_phylotree(
+                    B = B_alg1, 
                     labels = tags)
 
 
@@ -49,13 +49,13 @@ phylotree_opt <- B_to_phylotree(
 # phylogenetic trees
 find_common_subtrees(
   phylotree_1 = phylotree_real, 
-  phylotree_2 = phylotree_opt)
+  phylotree_2 = phylotree_alg1)
 
 
 # find the set of common subtrees between both
 # phylogenetic trees using tags
 find_common_subtrees(
   phylotree_1 = phylotree_real, 
-  phylotree_2 = phylotree_opt, 
+  phylotree_2 = phylotree_alg1, 
   labels = TRUE)
 }

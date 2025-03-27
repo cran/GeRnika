@@ -59,7 +59,7 @@ The following is an example of the generation of a noise-free instance of a tumo
 I <- create_instance(n = 5, m = 4, k = 0.5, selection = "neutral", seed = 1)
 ```
 
-This method returns the previously mentioned $\boldsymbol{F}$, $\boldsymbol{B}$ and $\boldsymbol{U}$ matrices and an additional $\boldsymbol{F_{true}}$ matrix, which we will describe later.
+This method returns the previously mentioned $\boldsymbol{F_{noisy}}$, $\boldsymbol{B}$ and $\boldsymbol{U}$ matrices and an additional $\boldsymbol{F_{true}}$ matrix, which we will describe later.
 
 Once we have shown an example of the instantiation of a tumor, we will analyze the effect of varying the values of the parameters.
 
@@ -137,7 +137,7 @@ Once we have analyzed the difference between the neutral evolution and positive 
 
 ## Sequencing noise
 
-`GeRnika` has a functionality to add sequencing noise to the simulated instances. In practice, this is done by adding a few parameters to the `create_instance` function. Sequencing noise is added on top of the noise-free $\boldsymbol{F}$ matrix, and the $U$ and $\boldsymbol{B}$ matrices suffer no changes. The `F` slot in the resulting object contains the noisy $\boldsymbol{F}$ matrix, while the `F_true` slot consists of the original noise-free $\boldsymbol{F}$ matrix. Note that these two slots contain equal matrices when no sequencing noise is added. 
+`GeRnika` has a functionality to add sequencing noise to the simulated instances. In practice, this is done by adding a few parameters to the `create_instance` function. Sequencing noise is added on top of the noise-free $\boldsymbol{F}$ matrix, and the $U$ and $\boldsymbol{B}$ matrices suffer no changes. The `F_{noisy}` slot in the resulting object contains the noisy $\boldsymbol{F}$ matrix, while the `F_true` slot consists of the original noise-free $\boldsymbol{F}$ matrix. Note that these two slots contain equal matrices when no sequencing noise is added. 
 
 Down below we compare an instance we have added sequencing noise to, with its noise-free counterpart.
 
@@ -168,12 +168,12 @@ F_to_heatmap <- function(U, values = TRUE, col_names = c("samples", "mutations",
 # Simulate a tumor with sequencing noise added:
 Inoisy <- create_instance(m = 5, n = 8, k = 0.5, selection = "neutral", noisy = TRUE, depth = 5, seed = 1)
 
-Fnoise <- F_to_heatmap(abs(Inoisy$F - Inoisy$F_true))
+Fnoise <- F_to_heatmap(abs(Inoisy$F_noisy - Inoisy$F_true))
 
 ggarrange(Fnoise)
 ```
 
-The heatmap from above shows the difference between the $\boldsymbol{F}$ matrix and the $\boldsymbol{F_{true}}$ matrix of a tumor instance, i.e. the noise added to the original VAF values of our samples. The amount of noise added is controlled by the depth parameter, which replicates the effect that the sequencing depth has on the noise level. This is explained in more detail in the following subsection.
+The heatmap from above shows the difference between the $\boldsymbol{F_{noisy}}$ matrix and the $\boldsymbol{F_{true}}$ matrix of a tumor instance, i.e. the noise added to the original VAF values of our samples. The amount of noise added is controlled by the depth parameter, which replicates the effect that the sequencing depth has on the noise level. This is explained in more detail in the following subsection.
 
 Finally, the `depth` parameter represents the sequencing read depth, that is, the average number of reads that map to the same locus (section of the genome). Therefore, the higher the sequencing depth, the most accurate the VAF values and thus, the lower the noise will be.
 
@@ -263,11 +263,11 @@ Once we have shown the usage of the methods for instantiating `Phylotree` class 
 
 `GeRnika` presents different functionalities for comparing tumor phylogenies. In order to show them, we will use the `B_mats` object included in the `GeRnika` package. This contains 10 $\boldsymbol{B}$ matrix trios. Each trio corresponds to a different instance, and the $\boldsymbol{B}$ matrices arise in the course of solving the Clonal Deconvolution and Evolution Problem (CDEP) for that instance, as follows:
 
-These matrices are based on the solution of various instances of the Clonal Deconvolution and Evolution Problem given by the *ILS* and *GRASP* methods. This trios consist of the following slots:
+These matrices are based on the solution of various instances of the Clonal Deconvolution and Evolution Problem given by two different algorithms methods. This trios consist of the following slots:
 
 - `B_true`: The real $\boldsymbol{B}$ matrix of a tumor.
-- `B_Grasp`: A $\boldsymbol{B}$ matrix generated througha  greedy, randomized adaptive heuristic strategy (GRASP) given an observed F matrix for the $\boldsymbol{B_{true}}$ matrix
-- `B_opt`: The optimal $\boldsymbol{B}$ matrix found by an iterated local search approach given an observed $\boldsymbol{F}$ matrix for the $\boldsymbol{B_{true}}$ matrix.
+- `B_alg1`: A $\boldsymbol{B}$ matrix generated through an algorithm "alg1".
+- `B_alg2`: The $\boldsymbol{B}$ matrix generated through an algorithm "alg2".
 
 The example below loads and plots the 3 $\boldsymbol{B}$ matrices of an instance in `B_mats`:
 
@@ -278,8 +278,8 @@ B_mats <- GeRnika::B_mats
 
 # Get one of the B matrix trios to compare them:
 B_real <- B_mats[[2]]$B_real
-B_opt <- B_mats[[2]]$B_opt
-B_grasp <- B_mats[[2]]$B_grasp
+B_alg1 <- B_mats[[2]]$B_alg1
+B_alg2 <- B_mats[[2]]$B_alg2
 
 #Create the list of the tags for the clones that compose the phylogenetic trees:
 tags <- c("mut1", "mut2", "mut3", "mut4", "mut5", "mut6", 
@@ -287,12 +287,12 @@ tags <- c("mut1", "mut2", "mut3", "mut4", "mut5", "mut6",
 
 #Create the Phylotree class objects using the previously loaded B matrices:
 phylotree_real <- B_to_phylotree(B_real, labels = tags)
-phylotree_opt <- B_to_phylotree(B_opt, labels = tags)
-phylotree_grasp <- B_to_phylotree(B=B_grasp, labels=tags)
+phylotree_alg1 <- B_to_phylotree(B_alg1, labels = tags)
+phylotree_alg2 <- B_to_phylotree(B=B_alg2, labels=tags)
 
 
 #Render both trees:
-DiagrammeR::render_graph(DiagrammeR::combine_graphs(data.tree::ToDiagrammeRGraph(phylotree_real@tree),DiagrammeR::combine_graphs(data.tree::ToDiagrammeRGraph(phylotree_grasp@tree),data.tree::ToDiagrammeRGraph(phylotree_opt@tree))))
+DiagrammeR::render_graph(DiagrammeR::combine_graphs(data.tree::ToDiagrammeRGraph(phylotree_real@tree),DiagrammeR::combine_graphs(data.tree::ToDiagrammeRGraph(phylotree_alg2@tree),data.tree::ToDiagrammeRGraph(phylotree_alg1@tree))))
 ```
 
 <center>
@@ -305,7 +305,7 @@ As these trees above relate to the same tumor instance, it is reasonable that th
 
 ## The `equals` method
 
-The three phylogenetic trees above are not equal. For example, `phylotree_real` and `phylotree_opt` are not equal as some of the edges of `phylotree_real` do not exist in `phylotree_opt` and the other way around. 
+The three phylogenetic trees above are not equal. For example, `phylotree_real` and `phylotree_alg1` are not equal as some of the edges of `phylotree_real` do not exist in `phylotree_alg1` and the other way around. 
 
 The equivalence between two phylogenetic trees may be checked by using the `equals` method as follows:
 
@@ -313,11 +313,11 @@ The equivalence between two phylogenetic trees may be checked by using the `equa
 # Checking if phylotree_real is equal to itself:
 equals(phylotree_1 = phylotree_real, phylotree_2 = phylotree_real)
 
-# Checking if phylotree_real and phylotree_opt are equal:
-equals(phylotree_1 = phylotree_real, phylotree_2 = phylotree_opt)
+# Checking if phylotree_real and phylotree_alg1 are equal:
+equals(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg1)
 ```
 
-Equal phylogenetic trees, by definition, are composed by the same nodes, connected by the same edges. As a result, this method returns `TRUE` when `phylotree_real` is compared with itself. Likewise, as `phylotree_real` and `phylotree_opt` are not equal, this method returns `FALSE` when we check whether they are equal or not.
+Equal phylogenetic trees, by definition, are composed by the same nodes, connected by the same edges. As a result, this method returns `TRUE` when `phylotree_real` is compared with itself. Likewise, as `phylotree_real` and `phylotree_alg1` are not equal, this method returns `FALSE` when we check whether they are equal or not.
 
 Nevertheless, even though two trees may not be equal, they may have common subtrees.
 
@@ -326,44 +326,44 @@ Nevertheless, even though two trees may not be equal, they may have common subtr
 The `find_common_subtrees` function calculates and plots all the maximal common subtrees between two phylogenetic trees. Moreover, it also outputs the number of common and independent (the ones not shared by both trees) edges of the trees. Finally, the method outputs the distance between the trees, which is computed as the sum of their independent edges.
 
 ```{r fig.align ="center",  out.width="9.5in", fig.align='center'}
-find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_grasp)
+find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg2)
 ```
 <center>
-The maximal common subtrees between `phylotree_real` and `phylotree_grasp`.
+The maximal common subtrees between `phylotree_real` and `phylotree_alg2`.
 </center>
 
 
 ```{r fig.align ="center", fig.dim = c(6,4), out.width="9.5in", fig.align='center'}
-find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_opt)
+find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg1)
 ```
 <center>
-The maximal common subtrees between `phylotree_real` and `phylotree_opt`.
+The maximal common subtrees between `phylotree_real` and `phylotree_alg1`.
 </center>
 
-We observe that there are two maximal common subtrees between `phylotree_real` and `phylotree_grasp`. Contrariwise, `phylotree_real` and `phylotree_opt` present a single maximal common subtree that covers the biggest part of both trees.
+We observe that there are two maximal common subtrees between `phylotree_real` and `phylotree_alg1`. Contrariwise, `phylotree_real` and `phylotree_alg2` present a single maximal common subtree that covers the biggest part of both trees.
 
 As before, we can add custom labels to the trees that result from this function call:
 
 
 ```{r out.width="9.5in", fig.align='center',fig.dim = c(6,4)}
-find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_grasp, labels = TRUE)
+find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg2, labels = TRUE)
 ```
 <center>
-The maximal common subtrees between `phylotree_real` and `phylotree_grasp` labelled using custom tags.
+The maximal common subtrees between `phylotree_real` and `phylotree_alg2` labelled using custom tags.
 </center>
 
 
 ```{r out.width="9.5in", fig.align='center', fig.dim = c(6,4)}
-find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_opt, labels = TRUE)
+find_common_subtrees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg1, labels = TRUE)
 ```
 
 
 
 <center>
-The common subtrees between `phylotree_real` and `phylotree_opt` labelled using custom tags.
+The common subtrees between `phylotree_real` and `phylotree_alg1` labelled using custom tags.
 </center>
 
-According to the plots from above, we conclude that `phylotree_real` shares more edges with `phylotree_opt` than it does with `phylotree_grasp`.
+According to the plots from above, we conclude that `phylotree_real` shares more edges with `phylotree_alg2` than it does with `phylotree_alg1`.
 
 `GeRnika` offers an additional method to compare two phylogenetic trees: a consensus tree that shows the union of the nodes and edges of both trees. 
 
@@ -373,12 +373,12 @@ The `combine_trees` function creates a tree that results from the union of the n
 independent edges of the tree passed as the first parameter of the method, while orange edges represent the independent edges
 of the second tree. Note that the independent edges of both trees are presented with more translucent colors.
 ```{r fig.align ="center", fig.dim = c(8.5,9.5), out.width = "7.5in", warning=FALSE}
-# Creating the consensus tree between phylotree_real and phylotree_grasp
-consensus_real_grasp <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_grasp)
+# Creating the consensus tree between phylotree_real and phylotree_alg2
+consensus_real_alg2 <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg2)
 
 
-# Creating the consensus tree between phylotree_real and phylotree_opt
-consensus_real_opt <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_opt)
+# Creating the consensus tree between phylotree_real and phylotree_alg1
+consensus_real_alg1 <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg1)
 
 
 ```
@@ -386,25 +386,25 @@ consensus_real_opt <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = 
 The consensus tree can be plotted by using the function `render_graph` of the `DiagrammeR` R package.
 
 ```{r fig.align ="center", fig.dim = c(7,8),out.width="9.5in", fig.align='center', warning=FALSE}
-# Rendering the consensus between phylotree_real and phylotree_grasp
-DiagrammeR::render_graph(consensus_real_grasp)
+# Rendering the consensus between phylotree_real and phylotree_alg2
+DiagrammeR::render_graph(consensus_real_alg2)
 
 ```
 
 <center>
-The consensus tree between `phylotree_real` and `phylotree_grasp`.
+The consensus tree between `phylotree_real` and `phylotree_alg2`.
 </center>
 
 ```{r,  fig.dim = c(5,6), out.width="9.5in", fig.align='center', warning=FALSE}
-# Rendering the consensus between phylotree_real and phylotree_opt
-DiagrammeR::render_graph(consensus_real_opt)
+# Rendering the consensus between phylotree_real and phylotree_alg1
+DiagrammeR::render_graph(consensus_real_alg1)
 ```
 
 <center>
-The consensus tree between `phylotree_real` and `phylotree_opt`.
+The consensus tree between `phylotree_real` and `phylotree_alg1`.
 </center>
 
-The above figures present the consensus tree between `phylotree_real` and `phylotree_opt` and the consensus tree between `phylotree_real` and `phylotree_grasp`, respectively. 
+The above figures present the consensus tree between `phylotree_real` and `phylotree_alg1` and the consensus tree between `phylotree_real` and `phylotree_alg2`, respectively. 
 
 Users can customize both the labels and the colors of the nodes. The latter can be done by providing a custom palette --a vector containing the hexadecimal code of various colors-- of 3 elements such as `c("#AAAAAAAA","#BBBBBBBB","#CCCCCCCC")`. Additionally, the user can use one of the color palettes included in GeRnika: *Lancet*, *NEJM* and *Simpsons* (default). 
 
@@ -412,9 +412,9 @@ Users can customize both the labels and the colors of the nodes. The latter can 
 # Load one of the default palettes of the package:
 palette <- GeRnika::palettes$Lancet
 
-# Create the consensus tree between phylotree_real and phylotree_opt 
+# Create the consensus tree between phylotree_real and phylotree_alg1 
 # using clone tags and the custom palette:
-consensus <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_opt, 
+consensus <- combine_trees(phylotree_1 = phylotree_real, phylotree_2 = phylotree_alg1, 
                            labels = TRUE, palette = palette)
 
 # Render the new consensus phylogenetic tree:
@@ -422,7 +422,7 @@ DiagrammeR::render_graph(consensus)
 ```
 
 <center>
-The consensus tree between `phylotree_real` and `phylotree_opt` using tags and a selected color palette.
+The consensus tree between `phylotree_real` and `phylotree_alg1` using tags and a selected color palette.
 </center>
 
 # Session information

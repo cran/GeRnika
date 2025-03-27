@@ -7,16 +7,16 @@
 \format{
 A list of lists composed by 10 trios of B matrices.
 \describe{
-  \item{Trio 1}{B_real, B_grasp and B_opt (matrices composed by 5 clones)}
-  \item{Trio 2}{B_real, B_grasp and B_opt (matrices composed by 5 clones)}
-  \item{Trio 3}{B_real, B_grasp and B_opt (matrices composed by 5 clones)}
-  \item{Trio 4}{B_real, B_grasp and B_opt (matrices composed by 5 clones)}
-  \item{Trio 5}{B_real, B_grasp and B_opt (matrices composed by 5 clones)}
-  \item{Trio 6}{B_real, B_grasp and B_opt (matrices composed by 10 clones)}
-  \item{Trio 7}{B_real, B_grasp and B_opt (matrices composed by 10 clones)}
-  \item{Trio 8}{B_real, B_grasp and B_opt (matrices composed by 10 clones)}
-  \item{Trio 9}{B_real, B_grasp and B_opt (matrices composed by 10 clones)}
-  \item{Trio 10}{B_real, B_grasp and B_opt (matrices composed by 10 clones)}
+  \item{Trio 1}{B_real, B_alg1 and B_alg2 (matrices composed by 5 clones)}
+  \item{Trio 2}{B_real, B_alg1 and B_alg2 (matrices composed by 5 clones)}
+  \item{Trio 3}{B_real, B_alg1 and B_alg2 (matrices composed by 5 clones)}
+  \item{Trio 4}{B_real, B_alg1 and B_alg2 (matrices composed by 5 clones)}
+  \item{Trio 5}{B_real, B_alg1 and B_alg2 (matrices composed by 5 clones)}
+  \item{Trio 6}{B_real, B_alg1 and B_alg2 (matrices composed by 10 clones)}
+  \item{Trio 7}{B_real, B_alg1 and B_alg2 (matrices composed by 10 clones)}
+  \item{Trio 8}{B_real, B_alg1 and B_alg2 (matrices composed by 10 clones)}
+  \item{Trio 9}{B_real, B_alg1 and B_alg2 (matrices composed by 10 clones)}
+  \item{Trio 10}{B_real, B_alg1 and B_alg2 (matrices composed by 10 clones)}
 }
 }
 \source{
@@ -26,6 +26,6 @@ Local source; as a result of the Grasp and the ILS methods used for solving the 
 B_mats
 }
 \description{
-A list of lists composed by 10 trios of B matrices; a real B matrix, a B matrix got by using the GRASP method and another one as a result of an ILS. These matrices can be used as examples for the methods of \code{GeRnika}.
+A list of lists composed by 10 trios of B matrices; a real B matrix, a B matrix got by using the one algorithm (alg1) method and another one as a result of another algorithm (alg2). These matrices can be used as examples for the methods of \code{GeRnika}.
 }
 \keyword{datasets}

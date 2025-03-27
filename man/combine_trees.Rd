@@ -33,7 +33,7 @@ B_mats <- GeRnika::B_mats
 
 
 B_real <- B_mats[[2]]$B_real
-B_opt <- B_mats[[2]]$B_opt
+B_alg1 <- B_mats[[2]]$B_alg1
 
 
 # Generate the tags for the genes of
@@ -47,16 +47,16 @@ phylotree_real <- B_to_phylotree(
                     B = B_real, 
                     labels = tags)
                     
-phylotree_opt <- B_to_phylotree(
-                    B = B_opt, 
+phylotree_alg1 <- B_to_phylotree(
+                    B = B_alg1, 
                     labels = tags)
 
 
 # Create the consensus tree between phylotree_real
-# and phylotree_opt
+# and phylotree_alg1
 consensus <- combine_trees(
                phylotree_1 = phylotree_real,
-               phylotree_2 = phylotree_opt)
+               phylotree_2 = phylotree_alg1)
                
                
 # Render the consensus tree
@@ -68,10 +68,10 @@ palette_1 <- GeRnika::palettes$Lancet
 
 
 # Create the consensus tree between phylotree_real
-# and phylotree_opt using tags and another palette
+# and phylotree_alg1 using tags and another palette
 consensus_tag <- combine_trees(
                    phylotree_1 = phylotree_real, 
-                   phylotree_2 = phylotree_opt,
+                   phylotree_2 = phylotree_alg1,
                    palette = palette_1,
                    labels = TRUE)
 

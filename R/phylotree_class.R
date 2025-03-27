@@ -1,7 +1,3 @@
-
-#' S4 class to represent a node in a phylogenetic tree.
-#'
-#' @slot Node A node object
 setClass("Node", slots="data.tree::Node")
 
 #' S4 class to represent phylogenetic trees.
@@ -17,19 +13,11 @@ setClass("Phylotree", slots = list(
                                    genes = "vector", parents = "vector", 
                                    tree = "Node", labels = "vector"))
 
-#' Retrieve the gene indices for the clones in a phylogenetic tree
-#' 
-#' @param B A square matrix that represents the phylogenetic tree.
-#' @return A vector of gene indices.
 get_genes<-function(B){
   genes<-c(unlist(purrr::map(1:nrow(B), function(x) get_mutation_idx(B,x))))
   return(genes)
 }
 
-#' Retrieve the clone indices for a set of gene indices
-#' 
-#' @param genes A vector of gene indices.
-#' @return A vector of clone indices.
 get_clones<-function(genes){
   clones<-c(unlist(purrr::map(1:length(genes),  function(x) which(genes==x))))
 }
@@ -185,61 +173,24 @@ B_to_phylotree <- function(B, labels = NA) {
   return(phylotree)
 }
 
-#' @export
-#' @title Get B matrix from \code{Phylotree} object.
-#' @description This function retrieves the B matrix of a \code{Phylotree} object.
-#'
-#' @param phylotree A \code{Phylotree} class object.
-#' @return A \code{data.frame} representing the B matrix of the phylogenetic tree.
-#' @examples
-#' # Get the B matrix of a tumor instance
-#' # composed by 10 subpopulations of
-#' # clones
-#' B <- create_instance(
-#'        n = 10, 
-#'        m = 4, 
-#'        k = 1, 
-#'        selection = "neutral")$B
-#'
-#' # Create a new 'Phylotree' object
-#' # on the basis of the B matrix
-#' phylotree <- B_to_phylotree(B)
-#'
-#' # Get the B matrix of the phyotree
-#' b1 <- phylotree_to_B(phylotree)
+
 phylotree_to_B <- function(phylotree) {
   return(phylotree@B)
 }
 
-#' Get parent nodes in a phylogenetic tree.
-#' 
-#' @description This function retrieves the parent nodes for each node in a given phylogenetic tree.
-#' @param phylotree An object of the \code{Phylotree} class representing the phylogenetic tree.
-#' @return A vector of parent nodes.
-#' 
+
 get_parents<-function(phylotree){
   parents<-c(unlist(purrr::map(1:nrow(phylotree@B), function(x) get_parent(phylotree,x))))
   parents[get_root_mutation(phylotree@B)]<--1
   return(parents)
 }
 
-#' Extract tree from \code{Phylotree} object.
-#' 
-#' @description This function extracts the tree structure from a given Phylotree object.
-#' @param phylotree An object of the \code{Phylotree} class.
-#' @return The tree structure of the input \code{Phylotree} object.
-#' 
+
 phylotree_to_tree<-function(phylotree){
   return(phylotree@tree)
 }
 
-#' Plot a phylogenetic tree
-#' 
-#' @description This function generates a plot of a phylogenetic tree. If the `labels` parameter is set to TRUE, the nodes of the tree will be labeled with the labels stored in the \code{Phylotree} object.
-#' @param phylotree An object of the \code{Phylotree} class representing the phylogenetic tree to be plotted.
-#' @param labels A logical value indicating whether to label the nodes with the labels stored in the \code{Phylotree} object. Default is FALSE.
-#' @return A plot of the phylogenetic tree.
-#' 
+
 plot_phylotree<-function(phylotree, labels=FALSE){
   if(!is.logical(labels)){
     stop("\n labels must be logical")
@@ -252,14 +203,6 @@ plot_phylotree<-function(phylotree, labels=FALSE){
 }
 
 
-#' @title Plot a phylogenetic tree with proportional node sizes and colors.
-#' @description This function plots a phylogenetic tree with nodes sized and colored according to the proportions of each clone. 
-#' 
-#' @param phylotree An object of the \code{Phylotree} class representing the phylogenetic tree to be plotted.
-#' @param proportions A numeric vector representing the proportions of each clone in the phylogenetic tree. The length of this vector should be equal to the number of clones in the tree.
-#'
-#' @return A graph representing the phylogenetic tree, with node sizes and colors reflecting clone proportions.
-#' 
 plot_p<-function(phylotree, proportions){
   if(length(phylotree@clones) != length(proportions)){
     stop("\n the proportion vectors length must be equal to the number of clones in the tree")

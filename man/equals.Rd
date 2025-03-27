@@ -24,7 +24,7 @@ B_mats <- GeRnika::B_mats
 
 
 B_real <- B_mats[[2]]$B_real
-B_opt <- B_mats[[2]]$B_opt
+B_alg1 <- B_mats[[2]]$B_alg1
 
 
 # Instantiate two \code{Phylotree} class objects on 
@@ -32,9 +32,9 @@ B_opt <- B_mats[[2]]$B_opt
 phylotree_real <- B_to_phylotree(
                     B = B_real)
                     
-phylotree_opt <- B_to_phylotree(
-                    B = B_opt)
+phylotree_alg1 <- B_to_phylotree(
+                    B = B_alg1)
 
 
-equals(phylotree_real, phylotree_opt)
+equals(phylotree_real, phylotree_alg1)
 }

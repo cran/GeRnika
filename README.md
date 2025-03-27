@@ -1,4 +1,8 @@
 
+<style>
+body {
+text-align: justify}
+</style>
 
 <img src="inst/extdata/GeRnika.png" width="25%" />
 
@@ -10,12 +14,12 @@ studying the composition and the evolutionary history of tumors.
 
 ## Installation
 
-`GeRnika` may be easily installed with the execution of the following
-command:
+`GeRnika` may be easily installed from CRAN with the execution of the
+following command:
 
 ``` r
 # commands for installing the package from github
-devtools::install_github("Aitorzan3/GeRnika")
+install.packages("GeRnika")
 ```
 
 Note that in order to install the vignettes together with the package,

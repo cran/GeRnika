@@ -23,7 +23,7 @@ create_tree<-function(phylotree){
 #'
 #  # Get the B matrixes from B_mats for comparing them
 #' B_real <- B_mats[[2]]$B_real
-#' B_opt <- B_mats[[2]]$B_opt
+#' B_alg1 <- B_mats[[2]]$B_alg1
 #' 
 #' 
 #' # Generate the tags for the genes of
@@ -37,8 +37,8 @@ create_tree<-function(phylotree){
 #'                     B = B_real, 
 #'                     labels = tags)
 #'                     
-#' phylotree_opt <- B_to_phylotree(
-#'                     B = B_opt, 
+#' phylotree_alg1 <- B_to_phylotree(
+#'                     B = B_alg1, 
 #'                     labels = tags)
 #' 
 #' 
@@ -46,14 +46,14 @@ create_tree<-function(phylotree){
 #' # phylogenetic trees
 #' find_common_subtrees(
 #'   phylotree_1 = phylotree_real, 
-#'   phylotree_2 = phylotree_opt)
+#'   phylotree_2 = phylotree_alg1)
 #' 
 #' 
 #' # find the set of common subtrees between both
 #' # phylogenetic trees using tags
 #' find_common_subtrees(
 #'   phylotree_1 = phylotree_real, 
-#'   phylotree_2 = phylotree_opt, 
+#'   phylotree_2 = phylotree_alg1, 
 #'   labels = TRUE)
 find_common_subtrees <- function(phylotree_1, phylotree_2, labels = FALSE) {
   label <- 'label'
@@ -107,7 +107,7 @@ find_common_subtrees <- function(phylotree_1, phylotree_2, labels = FALSE) {
 #'
 #  # Get the B matrixes from B_mats for comparing them
 #' B_real <- B_mats[[2]]$B_real
-#' B_opt <- B_mats[[2]]$B_opt
+#' B_alg1 <- B_mats[[2]]$B_alg1
 #' 
 #' 
 #' # Instantiate two \code{Phylotree} class objects on 
@@ -115,11 +115,11 @@ find_common_subtrees <- function(phylotree_1, phylotree_2, labels = FALSE) {
 #' phylotree_real <- B_to_phylotree(
 #'                     B = B_real)
 #'                     
-#' phylotree_opt <- B_to_phylotree(
-#'                     B = B_opt)
+#' phylotree_alg1 <- B_to_phylotree(
+#'                     B = B_alg1)
 #' 
 #' 
-#' equals(phylotree_real, phylotree_opt)
+#' equals(phylotree_real, phylotree_alg1)
 equals <- function(phylotree_1, phylotree_2) {
   return(all(phylotree_1@parents == phylotree_2@parents))
 }
@@ -141,7 +141,7 @@ equals <- function(phylotree_1, phylotree_2) {
 #'
 #  # Get the B matrixes from B_mats for comparing them
 #' B_real <- B_mats[[2]]$B_real
-#' B_opt <- B_mats[[2]]$B_opt
+#' B_alg1 <- B_mats[[2]]$B_alg1
 #' 
 #' 
 #' # Generate the tags for the genes of
@@ -155,16 +155,16 @@ equals <- function(phylotree_1, phylotree_2) {
 #'                     B = B_real, 
 #'                     labels = tags)
 #'                     
-#' phylotree_opt <- B_to_phylotree(
-#'                     B = B_opt, 
+#' phylotree_alg1 <- B_to_phylotree(
+#'                     B = B_alg1, 
 #'                     labels = tags)
 #' 
 #' 
 #' # Create the consensus tree between phylotree_real
-#' # and phylotree_opt
+#' # and phylotree_alg1
 #' consensus <- combine_trees(
 #'                phylotree_1 = phylotree_real,
-#'                phylotree_2 = phylotree_opt)
+#'                phylotree_2 = phylotree_alg1)
 #'                
 #'                
 #' # Render the consensus tree
@@ -176,10 +176,10 @@ equals <- function(phylotree_1, phylotree_2) {
 #' 
 #' 
 #' # Create the consensus tree between phylotree_real
-#' # and phylotree_opt using tags and another palette
+#' # and phylotree_alg1 using tags and another palette
 #' consensus_tag <- combine_trees(
 #'                    phylotree_1 = phylotree_real, 
-#'                    phylotree_2 = phylotree_opt,
+#'                    phylotree_2 = phylotree_alg1,
 #'                    palette = palette_1,
 #'                    labels = TRUE)
 #' 

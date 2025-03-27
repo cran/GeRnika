@@ -23,14 +23,14 @@ This function adds noise to the variant allele frequency (VAF) values in an F ma
 # Calculate the noisy VAF values of a series of mutations in a set of samples, given the true 
 # VAF values in the F matrix F_true, a depth of 30 and an overdispersion of 5
 
-# Create an instance of a tumor with 50 clones,
-# 10 samples, k = 5, positive selection without noise
+# Simulate the noise-free F matrix of a tumor with 50 clones,
+# 10 samples, k = 5, following a positive selection model
 F_true <- create_instance(
   n = 50,
   m = 10,
   k = 5,
   selection = "positive", 
-  noisy = FALSE)$F
+  noisy = FALSE)$F_true
 
 # Then we add the noise using a depth of 30 and an overdispersion of 5.
 noisy_F <- add_noise(F_true, 30, 5)
